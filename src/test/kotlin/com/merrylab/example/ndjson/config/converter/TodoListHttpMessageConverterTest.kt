@@ -2,7 +2,7 @@ package com.merrylab.example.ndjson.config.converter
 
 import com.merrylab.example.ndjson.TodoService
 import com.merrylab.example.ndjson.controller.BulkController
-import com.merrylab.example.ndjson.domain.ToDoRequest
+import com.merrylab.example.ndjson.domain.Todo
 import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
@@ -43,8 +43,8 @@ internal class TodoListHttpMessageConverterTest {
         """.trimIndent()
 
         val expected = listOf(
-                ToDoRequest(id = "test_1", name = "Work", priority = 1),
-                ToDoRequest(id = "test_2", name = "Todo", priority = 2)
+                Todo(id = "test_1", name = "Work", priority = 1),
+                Todo(id = "test_2", name = "Todo", priority = 2)
         )
 
         val builder = MockMvcRequestBuilders
@@ -52,14 +52,14 @@ internal class TodoListHttpMessageConverterTest {
                 .contentType("application/x-ndjson")
                 .content(requestBody)
 
-        val slot = slot<List<ToDoRequest>>()
+        val slot = slot<List<Todo>>()
         every { todoService.saveTodos(capture(slot)) } just Runs
 
         mockMvc.perform(builder)
                 .andExpect(MockMvcResultMatchers.status().isCreated)
                 .andDo(MockMvcResultHandlers.print())
 
-        val todoRequests = slot.captured
-        Assertions.assertThat(todoRequests).containsAll(expected)
+        val todos = slot.captured
+        Assertions.assertThat(todos).containsAll(expected)
     }
 }

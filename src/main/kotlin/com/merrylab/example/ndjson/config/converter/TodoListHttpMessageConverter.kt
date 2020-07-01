@@ -24,9 +24,7 @@ class TodoListHttpMessageConverter :
     override fun writeInternal(t: List<Todo>, outputMessage: HttpOutputMessage) {
         // If you use request only, nothing to implement convert code. Or you can throw an exception.
         val responses = t.joinToString("\n") { objectMapper.writeValueAsString(it) }
-        val outputStream = outputMessage.body
-        outputStream.write(responses.toByteArray())
-        outputStream.close()
+        outputMessage.body.bufferedWriter().use { it.write(responses) }
     }
 
     override fun readInternal(clazz: Class<out List<Todo>>, inputMessage: HttpInputMessage): List<Todo> {
