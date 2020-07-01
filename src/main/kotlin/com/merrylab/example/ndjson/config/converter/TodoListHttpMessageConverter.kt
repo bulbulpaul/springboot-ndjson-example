@@ -2,8 +2,7 @@ package com.merrylab.example.ndjson.config.converter
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.merrylab.example.ndjson.domain.ToDoListRequest
-import com.merrylab.example.ndjson.domain.ToDoRequest
+import com.merrylab.example.ndjson.domain.Todo
 import org.springframework.http.HttpInputMessage
 import org.springframework.http.HttpOutputMessage
 import org.springframework.http.MediaType
@@ -11,7 +10,7 @@ import org.springframework.http.converter.AbstractHttpMessageConverter
 
 
 class TodoListHttpMessageConverter :
-        AbstractHttpMessageConverter<ToDoListRequest>(
+        AbstractHttpMessageConverter<List<Todo>>(
                 // set target content type
                 MediaType("application", "x-ndjson")
         ) {
@@ -19,19 +18,22 @@ class TodoListHttpMessageConverter :
     private val objectMapper = jacksonObjectMapper()
 
     override fun supports(clazz: Class<*>): Boolean {
-        return ToDoListRequest::class.java.isAssignableFrom(clazz)
+        return List::class.java.isAssignableFrom(clazz)
     }
 
-    override fun writeInternal(t: ToDoListRequest, outputMessage: HttpOutputMessage) {
-        val responses = t.todoList.map { objectMapper.writeValueAsString(it) }.joinToString("\n")
-        outputMessage.body.bufferedWriter().use { it.write(responses) }
+    override fun writeInternal(t: List<Todo>, outputMessage: HttpOutputMessage) {
+        // If you use request only, nothing to implement convert code. Or you can throw an exception.
+        val responses = t.joinToString("\n") { objectMapper.writeValueAsString(it) }
+        val outputStream = outputMessage.body
+        outputStream.write(responses.toByteArray())
+        outputStream.close()
     }
 
-    override fun readInternal(clazz: Class<out ToDoListRequest>, inputMessage: HttpInputMessage): ToDoListRequest {
+    override fun readInternal(clazz: Class<out List<Todo>>, inputMessage: HttpInputMessage): List<Todo> {
         val requestBody = inputMessage.body.bufferedReader().use { it.readLines() }
         val requests = requestBody.map {
-            objectMapper.readValue<ToDoRequest>(it)
+            objectMapper.readValue<Todo>(it)
         }
-        return ToDoListRequest(requests)
+        return requests
     }
 }
