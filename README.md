@@ -17,8 +17,14 @@ Content-Type: application/x-ndjson
 Content-Length: 85
 Date: Wed, 01 Jul 2020 23:54:48 GMT
 
-{"id":"test_1","name":"Work","priority":1}
-{"id":"test_2","name":"Todo","priority":2}
+$ curl -i -X GET "http://localhost:8080/todos"                                                                                        
+ HTTP/1.1 200 
+ Content-Type: application/x-ndjson
+ Content-Length: 85
+ Date: Thu, 02 Jul 2020 00:44:50 GMT
+ 
+ {"id":"test_1","name":"Work","priority":1}
+ {"id":"test_2","name":"Todo","priority":2}
 ```
 
 ## LICENSE
